@@ -4,21 +4,27 @@ import { useRouter } from "vue-router";
 
 const router = useRouter();
 
+const teamName = ref("");
 const email = ref("");
+const sport = ref("");
+const location = ref("");
 const password = ref("");
 
-function goRegister() {
-  router.push("/register");
+function goLogin() {
+  router.push("/login"); // nanti kita buat LoginView kalau sudah butuh
 }
 
-function onLogin() {
-  console.log("login", {
+function onRegister() {
+  console.log("register", {
+    teamName: teamName.value,
     email: email.value,
+    sport: sport.value,
+    location: location.value,
     password: password.value,
   });
 
-  // simulasi login sukses
-  router.push("/");
+  alert("Daftar berhasil, silakan login");
+  router.push("/login");
 }
 
 </script>
@@ -37,36 +43,43 @@ function onLogin() {
       <div class="body">
         <!-- Tabs -->
         <div class="tabs">
-          <button class="tab active" type="button">Login</button>
-          <button class="tab" type="button" @click="goRegister">Daftar</button>
+          <button class="tab" type="button" @click="goLogin">Login</button>
+          <button class="tab active" type="button">Daftar</button>
         </div>
 
         <!-- Form -->
-        <form class="form" @submit.prevent="onLogin">
+        <form class="form" @submit.prevent="onRegister">
+          <div class="group">
+            <label>Nama Tim</label>
+            <input v-model="teamName" type="text" placeholder="FC Thunder" required />
+          </div>
+
           <div class="group">
             <label>Email</label>
-            <input
-              v-model="email"
-              type="email"
-              placeholder="email@example.com"
-              required
-            />
+            <input v-model="email" type="email" placeholder="email@example.com" required />
+          </div>
+
+          <div class="group">
+            <label>Olahraga Utama</label>
+            <input v-model="sport" type="text" placeholder="Futsal, Basketball, dll" required />
+          </div>
+
+          <div class="group">
+            <label>Lokasi</label>
+            <input v-model="location" type="text" placeholder="Jakarta Selatan" required />
           </div>
 
           <div class="group">
             <label>Password</label>
-            <input
-              v-model="password"
-              type="password"
-              placeholder="••••••••"
-              required
-            />
+            <input v-model="password" type="password" placeholder="••••••••" required />
           </div>
 
-          <button class="submit" type="submit">Masuk</button>
+          <button class="submit" type="submit">Daftar Sekarang</button>
 
-          <p class="forgot">
-            <a href="#">Lupa password?</a>
+          <p class="terms">
+            Dengan mendaftar, Anda menyetujui
+            <a href="#">Syarat & Ketentuan</a> dan
+            <a href="#">Kebijakan Privasi</a>
           </p>
         </form>
       </div>
@@ -125,6 +138,7 @@ function onLogin() {
 
 .body{
   padding:26px 26px 30px;
+  background:#fff;
 }
 
 .tabs{
@@ -133,7 +147,7 @@ function onLogin() {
   border-radius:999px;
   padding:6px;
   gap:6px;
-  margin: 0 auto 22px;
+  margin: 0 auto 18px;
   width:min(420px, 100%);
 }
 
@@ -157,7 +171,7 @@ function onLogin() {
   margin:0 auto;
   display:flex;
   flex-direction:column;
-  gap:16px;
+  gap:14px;
 }
 
 .group label{
@@ -188,7 +202,7 @@ function onLogin() {
   color:#fff;
   font-weight:700;
   cursor:pointer;
-  margin-top:6px;
+  margin-top:8px;
   background: linear-gradient(90deg, #b21f3b, #ff3b5a);
 }
 
@@ -196,18 +210,19 @@ function onLogin() {
   transform: translateY(1px);
 }
 
-.forgot{
+.terms{
+  margin-top:12px;
+  font-size:14px;
+  color:#4b5563;
   text-align:center;
-  margin-top:6px;
+  line-height:1.5;
 }
 
-.forgot a{
+.terms a{
   color:#e63946;
-  font-weight:600;
   text-decoration:none;
+  font-weight:600;
 }
 
-.forgot a:hover{
-  text-decoration:underline;
-}
+.terms a:hover{ text-decoration: underline; }
 </style>
