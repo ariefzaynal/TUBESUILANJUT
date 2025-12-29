@@ -9,16 +9,73 @@ import ChatView from "../views/ChatView.vue";
 const router = createRouter({
   history: createWebHistory(),
   routes: [
-    { path: "/", name: "home", component: HomeView },
-    { path: "/login", name: "login", component: LoginView },
-    { path: "/register", name: "register", component: RegisterView },
-    { path: "/cari", name: "cari", component: CariLawanView },
-    { path: "/booking", name: "booking", component: BookingLapanganView },
-    { path: "/chat", name: "chat", component: ChatView },
-
-    // placeholder (biar navbar ga error dulu)
-    { path: "/profil", name: "profil", component: HomeView },
+    { 
+      path: "/", 
+      name: "home", 
+      component: HomeView,
+      meta: { title: "Home - SportConnect" }
+    },
+    { 
+      path: "/login", 
+      name: "login", 
+      component: LoginView,
+      meta: { title: "Login - SportConnect" }
+    },
+    { 
+      path: "/register", 
+      name: "register", 
+      component: RegisterView,
+      meta: { title: "Register - SportConnect" }
+    },
+    { 
+      path: "/cari-lawan", 
+      name: "cari-lawan", 
+      component: CariLawanView,
+      meta: { title: "Cari Lawan - SportConnect" }
+    },
+    { 
+      path: "/booking-lapangan", 
+      name: "booking-lapangan", 
+      component: BookingLapanganView,
+      meta: { title: "Booking Lapangan - SportConnect" }
+    },
+    { 
+      path: "/chat", 
+      name: "chat", 
+      component: ChatView,
+      meta: { title: "Chat - SportConnect" }
+    },
+    { 
+      path: "/profil", 
+      name: "profil", 
+      component: () => import("../views/ProfilView.vue"), // Lazy loading untuk profil
+      meta: { title: "Profil - SportConnect" }
+    },
+    // Redirect untuk URL lama
+    { 
+      path: "/cari", 
+      redirect: "/cari-lawan" 
+    },
+    { 
+      path: "/booking", 
+      redirect: "/booking-lapangan" 
+    },
   ],
+});
+
+// Navigation guard untuk mengubah judul halaman
+router.beforeEach((to, from, next) => {
+  // Set judul halaman dari meta
+  if (to.meta.title) {
+    document.title = to.meta.title;
+  }
+  
+  // Simpan route sebelumnya untuk kembali
+  if (from.name) {
+    localStorage.setItem('previousRoute', from.fullPath);
+  }
+  
+  next();
 });
 
 export default router;

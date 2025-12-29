@@ -1,129 +1,170 @@
 <script setup lang="ts">
-import { useRouter } from "vue-router";
+import AppNavbar from "../components/AppNavbar.vue";
+import { ref } from "vue";
 
-const router = useRouter();
+const notifications = ref([
+  {
+    id: 1,
+    title: "Venue Basketball (FINNS)",
+    description: "mengajukan pertandingan persahabatan untuk Sabtu, 14 November 2024",
+    distance: "2 km dari lokasi",
+    time: "2 jam yang lalu",
+    status: "pending"
+  },
+  {
+    id: 2,
+    title: "Arena Futsal Jakarta Timur",
+    description: "membuka slot booking baru untuk Jumat, 15 November 2024",
+    distance: "5 km dari lokasi",
+    time: "3 jam yang lalu",
+    status: "pending"
+  },
+  {
+    id: 3,
+    title: "Pioneer Futsal (FINNS)",
+    description: "mengajukan pertandingan persahabatan untuk Senin, 12 November 2024",
+    distance: "1 km dari lokasi",
+    time: "5 jam yang lalu",
+    status: "pending"
+  },
+  {
+    id: 4,
+    title: "Persahabatan vs Lightning FC (Genting)",
+    description: "Hasil: Menang 9-5",
+    distance: "2 km dari lokasi",
+    time: "1 hari yang lalu",
+    status: "completed"
+  }
+]);
 
-function scrollToFeatures() {
-  const el = document.getElementById("features");
-  el?.scrollIntoView({ behavior: "smooth", block: "start" });
+function acceptNotification(id: number) {
+  const notification = notifications.value.find(n => n.id === id);
+  if (notification) {
+    notification.status = "accepted";
+    alert(`Permintaan dari "${notification.title}" telah diterima!`);
+  }
 }
 
-function logout() {
-  // sementara (demo): nanti kalau pakai token/pinia, hapus datanya di sini
-  router.push("/login");
+function rejectNotification(id: number) {
+  const notification = notifications.value.find(n => n.id === id);
+  if (notification) {
+    notification.status = "rejected";
+    alert(`Permintaan dari "${notification.title}" telah ditolak!`);
+  }
 }
 </script>
 
 <template>
   <div class="page">
     <!-- NAVBAR -->
-    <header class="navbar">
-      <div class="nav-left">
-        <div class="brand">
-          <div class="brand-badge">⚽</div>
-          <span class="logo">SPORTIVE</span>
+    <AppNavbar />
+
+    <!-- DASHBOARD CONTENT -->
+    <main class="dashboard">
+      <div class="dashboard-header">
+        <h1>Selamat datang kembali! Berikut update terbaru untuk tim Anda.</h1>
+      </div>
+
+      <!-- STATS CARDS -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon">📊</div>
+          <div class="stat-content">
+            <h3>Total Pertandingan</h3>
+            <div class="stat-main">
+              <span class="stat-number">45</span>
+              <span class="stat-change positive">+18% bulan ini</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">🏆</div>
+          <div class="stat-content">
+            <h3>Total Menang</h3>
+            <div class="stat-main">
+              <span class="stat-number">32</span>
+              <span class="stat-change positive">+3,5 dari bulan lalu</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">👥</div>
+          <div class="stat-content">
+            <h3>Anggota Tim</h3>
+            <div class="stat-main">
+              <span class="stat-number">15</span>
+              <span class="stat-change positive">+2 anggota baru</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">📅</div>
+          <div class="stat-content">
+            <h3>Jadwal Mendatang</h3>
+            <div class="stat-main">
+              <span class="stat-number">3</span>
+              <span class="stat-change neutral">dalam 7 hari</span>
+            </div>
+          </div>
         </div>
       </div>
 
-<nav class="nav-center">
-  <RouterLink to="/" class="nav-link">Home</RouterLink>
-  <RouterLink to="/cari" class="nav-link">Cari Lawan</RouterLink>
-  <RouterLink to="/booking" class="nav-link">Booking Lapangan</RouterLink>
-  <RouterLink to="/chat" class="nav-link">Chat</RouterLink>
-</nav>
-
-
-      <div class="nav-right">
-        <button class="btn-logout" type="button" @click="logout">Keluar</button>
-      </div>
-    </header>
-
-    <!-- HERO -->
-    <section class="hero">
-      <div class="hero-inner">
-        <h1>
-          Temukan Lawan dan Lapangan<br />
-          Olahraga Lebih Mudah
-        </h1>
-
-        <p>
-          Cari lawan, booking lapangan, dan kelola tim Anda dalam satu platform.
-          Mulai dari fitur unggulan kami di bawah ini.
-        </p>
-
-        <div class="hero-btn">
-          <button class="btn-primary" type="button" @click="scrollToFeatures">
-            Lihat Fitur
-          </button>
-        </div>
-      </div>
-    </section>
-
-    <!-- FITUR -->
-    <section id="features" class="features">
-      <h2>Fitur Unggulan Kami</h2>
-      <p class="sub">
-        Semua yang Anda butuhkan untuk pengalaman olahraga yang lebih baik
-      </p>
-
-      <div class="feature-grid">
-        <div class="card">
-          <div class="icon">👥</div>
-          <h3>Cari Lawan</h3>
-          <p>Temukan tim lawan sesuai level dan lokasi Anda.</p>
+      <!-- NOTIFICATIONS SECTION -->
+      <section class="notifications-section">
+        <div class="section-header">
+          <h2>Notifikasi</h2>
+          <span class="section-subtitle">Update terbaru untuk tim Anda</span>
         </div>
 
-        <div class="card">
-          <div class="icon">📍</div>
-          <h3>Booking Lapangan</h3>
-          <p>Pesan lapangan favorit dengan mudah dan cepat.</p>
+        <div class="notifications-grid">
+          <!-- NOTIFICATION CARDS -->
+          <div 
+            v-for="notif in notifications" 
+            :key="notif.id" 
+            class="notification-card"
+            :class="{ 'completed': notif.status === 'completed' }"
+          >
+            <div class="notification-header">
+              <div class="notification-title">
+                <h3>{{ notif.title }}</h3>
+                <span class="notification-distance">{{ notif.distance }}</span>
+              </div>
+              <span class="notification-time">{{ notif.time }}</span>
+            </div>
+            
+            <p class="notification-desc">{{ notif.description }}</p>
+            
+            <div class="notification-actions" v-if="notif.status === 'pending'">
+              <button 
+                class="btn-accept" 
+                @click="acceptNotification(notif.id)"
+              >
+                ✓ Terima
+              </button>
+              <button 
+                class="btn-reject" 
+                @click="rejectNotification(notif.id)"
+              >
+                ✗ Tolak
+              </button>
+            </div>
+            
+            <div class="notification-completed" v-else-if="notif.status === 'completed'">
+              <span class="completed-badge">✓ Selesai</span>
+            </div>
+            
+            <div class="notification-status" v-else>
+              <span :class="`status-badge ${notif.status}`">
+                {{ notif.status === 'accepted' ? '✓ Diterima' : '✗ Ditolak' }}
+              </span>
+            </div>
+          </div>
         </div>
-
-        <div class="card">
-          <div class="icon">🏆</div>
-          <h3>Kelola Tim</h3>
-          <p>Atur anggota, jadwal, dan statistik tim Anda.</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- STAT -->
-    <section class="stats">
-      <div class="stat">
-        <h3>1000+</h3>
-        <span>Tim Terdaftar</span>
-      </div>
-      <div class="stat">
-        <h3>5000+</h3>
-        <span>Pertandingan</span>
-      </div>
-      <div class="stat">
-        <h3>250+</h3>
-        <span>Lapangan</span>
-      </div>
-      <div class="stat">
-        <h3>10+</h3>
-        <span>Jenis Olahraga</span>
-      </div>
-    </section>
-
-    <!-- CTA -->
-    <section class="cta">
-      <h2>Siap Bermain?</h2>
-      <p>
-        Cari lawan tanding dan booking lapangan sekarang juga.
-      </p>
-      <button class="btn-primary" type="button" @click="scrollToFeatures">
-        Mulai
-      </button>
-    </section>
-
-    <!-- FOOTER -->
-    <footer class="footer">
-      <div class="footer-bottom">
-        © 2024 SPORTIVE. All rights reserved.
-      </div>
-    </footer>
+      </section>
+    </main>
   </div>
 </template>
 
@@ -132,245 +173,311 @@ function logout() {
   min-height: 100vh;
   font-family: "Segoe UI", system-ui, -apple-system, Arial, sans-serif;
   color: #111827;
+  background: #f8fafc;
 }
 
-/* NAVBAR */
-.navbar {
-  position: sticky;
-  top: 0;
-  z-index: 50;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 16px 60px;
-  background: #ffffff;
-  border-bottom: 2px solid #0b1d4d;
+/* DASHBOARD */
+.dashboard {
+  padding: 40px 60px;
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+.dashboard-header {
+  margin-bottom: 40px;
 }
 
-.brand-badge {
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
-  display: grid;
-  place-items: center;
-  background: #e63946;
-  color: white;
-  font-size: 16px;
-}
-
-.logo {
-  font-weight: 900;
-  letter-spacing: 0.6px;
-  font-size: 20px;
-}
-
-.nav-center {
-  display: flex;
-  gap: 32px;
-}
-
-.nav-link {
-  color: #374151;
-  text-decoration: none;
-  font-weight: 600;
-  cursor: pointer;
-  padding: 8px 0;
-  border-bottom: 2px solid transparent;
-  transition: all 0.3s ease;
-}
-
-.nav-link:hover {
-  color: #e63946;
-}
-
-.nav-link.router-link-active {
-  color: #e63946;
-  border-bottom: 2px solid #e63946;
-}
-
-.btn-logout {
-  border: none;
-  background: #111827;
-  color: white;
-  padding: 10px 20px;
-  border-radius: 8px;
-  cursor: pointer;
+.dashboard-header h1 {
+  font-size: 32px;
   font-weight: 700;
-  transition: background 0.3s ease;
+  color: #111827;
+  line-height: 1.3;
 }
 
-.btn-logout:hover {
-  background: #1f2937;
-}
-
-/* HERO */
-.hero {
-  text-align: center;
-  padding: 110px 20px;
-  background: linear-gradient(180deg, #0b1d4d, #b21f3b);
-  color: white;
-}
-
-.hero-inner {
-  max-width: 920px;
-  margin: 0 auto;
-}
-
-.hero h1 {
-  font-size: 44px;
-  line-height: 1.15;
-  margin-bottom: 16px;
-}
-
-.hero p {
-  max-width: 740px;
-  margin: 0 auto;
-  opacity: 0.92;
-  line-height: 1.6;
-}
-
-.hero-btn {
-  margin-top: 30px;
-  display: flex;
-  justify-content: center;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.btn-primary {
-  background: #e63946;
-  border: none;
-  color: white;
-  padding: 14px 22px;
-  border-radius: 12px;
-  cursor: pointer;
-  font-weight: 800;
-}
-
-/* FEATURES */
-.features {
-  padding: 84px 20px;
-  text-align: center;
-}
-
-.features h2 {
-  font-size: 34px;
-}
-
-.sub {
-  margin-top: 10px;
-  color: #6b7280;
-}
-
-.feature-grid {
-  max-width: 980px;
-  margin: 44px auto 0;
+/* STATS GRID */
+.stats-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 24px;
+  margin-bottom: 48px;
 }
 
-.card {
-  background: #ffffff;
-  padding: 30px;
+.stat-card {
+  background: white;
   border-radius: 16px;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
-  text-align: left;
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e5e7eb;
+  transition: transform 0.3s ease;
 }
 
-.card h3 {
-  margin-top: 10px;
-  margin-bottom: 8px;
+.stat-card:hover {
+  transform: translateY(-4px);
 }
 
-.card p {
-  color: #6b7280;
-  line-height: 1.6;
-}
-
-.icon {
-  width: 44px;
-  height: 44px;
+.stat-icon {
+  width: 60px;
+  height: 60px;
   border-radius: 14px;
   display: grid;
   place-items: center;
   background: rgba(230, 57, 70, 0.12);
-  font-size: 22px;
+  font-size: 28px;
+  flex-shrink: 0;
 }
 
-/* STATS */
-.stats {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  background: linear-gradient(90deg, #0b1d4d, #b21f3b);
-  color: white;
-  padding: 64px 20px;
-  text-align: center;
+.stat-content {
+  flex: 1;
 }
 
-.stat h3 {
-  font-size: 34px;
+.stat-content h3 {
+  font-size: 16px;
+  color: #6b7280;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.stat-main {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.stat-number {
+  font-size: 32px;
+  font-weight: 800;
+  color: #111827;
+}
+
+.stat-change {
+  font-size: 14px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 20px;
+}
+
+.stat-change.positive {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.stat-change.neutral {
+  background: #f3f4f6;
+  color: #4b5563;
+}
+
+/* NOTIFICATIONS SECTION */
+.notifications-section {
+  background: white;
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e5e7eb;
+}
+
+.section-header {
+  margin-bottom: 32px;
+}
+
+.section-header h2 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #111827;
   margin-bottom: 6px;
 }
 
-.stat span {
-  opacity: 0.9;
-}
-
-/* CTA */
-.cta {
-  padding: 84px 20px;
-  text-align: center;
-}
-
-.cta h2 {
-  font-size: 34px;
-}
-
-.cta p {
-  margin: 12px auto 26px;
+.section-subtitle {
   color: #6b7280;
-  max-width: 720px;
-  line-height: 1.6;
+  font-size: 14px;
+  font-weight: 500;
 }
 
-/* FOOTER */
-.footer {
-  background: #0b1d4d;
+.notifications-grid {
+  display: grid;
+  gap: 20px;
+}
+
+/* NOTIFICATION CARD */
+.notification-card {
+  background: #f8fafc;
+  border-radius: 12px;
+  padding: 24px;
+  border: 1px solid #e5e7eb;
+  transition: all 0.3s ease;
+}
+
+.notification-card.completed {
+  background: #f0fdf4;
+  border-color: #bbf7d0;
+}
+
+.notification-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.notification-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.notification-title h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0;
+}
+
+.notification-distance {
+  background: #e0e7ff;
+  color: #3730a3;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.notification-time {
+  color: #6b7280;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.notification-desc {
+  color: #4b5563;
+  line-height: 1.6;
+  margin-bottom: 20px;
+  font-size: 15px;
+}
+
+/* NOTIFICATION ACTIONS */
+.notification-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.btn-accept, .btn-reject {
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+}
+
+.btn-accept {
+  background: #10b981;
   color: white;
 }
 
-.footer-bottom {
-  border-top: 1px solid rgba(255, 255, 255, 0.12);
-  text-align: center;
-  padding: 16px 20px;
-  opacity: 0.9;
+.btn-accept:hover {
+  background: #059669;
+  transform: translateY(-1px);
+}
+
+.btn-reject {
+  background: #f3f4f6;
+  color: #6b7280;
+  border: 1px solid #d1d5db;
+}
+
+.btn-reject:hover {
+  background: #e5e7eb;
+  transform: translateY(-1px);
+}
+
+/* NOTIFICATION STATUS */
+.notification-completed,
+.notification-status {
+  margin-top: 12px;
+}
+
+.completed-badge,
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 20px;
   font-size: 14px;
+  font-weight: 600;
+}
+
+.completed-badge {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.status-badge.accepted {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.status-badge.rejected {
+  background: #fee2e2;
+  color: #991b1b;
 }
 
 /* RESPONSIVE */
-@media (max-width: 920px) {
-  .navbar {
-    padding: 14px 18px;
+@media (max-width: 1024px) {
+  .dashboard {
+    padding: 30px;
   }
-  .nav-center {
-    display: none;
+}
+
+@media (max-width: 768px) {
+  .dashboard {
+    padding: 20px;
   }
-  .hero h1 {
-    font-size: 34px;
+  
+  .dashboard-header h1 {
+    font-size: 24px;
   }
-  .feature-grid {
+  
+  .stats-grid {
     grid-template-columns: 1fr;
   }
-  .stats {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 18px;
+  
+  .stat-card {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .stat-main {
+    justify-content: center;
+  }
+  
+  .notification-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .notification-actions {
+    flex-direction: column;
+  }
+  
+  .btn-accept, .btn-reject {
+    width: 100%;
+  }
+  
+  .notification-title {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
   }
 }
 </style>

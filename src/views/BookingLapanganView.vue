@@ -1,11 +1,16 @@
 <script setup lang="ts">
 import AppNavbar from "../components/AppNavbar.vue";
 import AppFooter from "../components/AppFooter.vue";
-import { ref, computed } from "vue";
+import { ref, computed, watch } from "vue";
 
 const jenis = ref("Semua Olahraga");
 const tanggal = ref("");
 const jam = ref("");
+
+// State untuk popup
+const showPopup = ref(false);
+const selectedField = ref<any>(null);
+const isBookingSuccess = ref(false);
 
 const fields = ref([
   {
@@ -84,6 +89,59 @@ function formatPrice(price: number): string {
     minimumFractionDigits: 0
   }).format(price);
 }
+
+// Fungsi untuk membuka popup booking
+function openBookingPopup(field: any) {
+  // Cek apakah tanggal dan jam sudah diisi
+  if (!tanggal.value || !jam.value) {
+    alert("Harap pilih tanggal dan jam booking terlebih dahulu!");
+    return;
+  }
+  
+  selectedField.value = field;
+  showPopup.value = true;
+  isBookingSuccess.value = false;
+}
+
+// Fungsi untuk konfirmasi booking
+function confirmBooking() {
+  if (!tanggal.value || !jam.value) {
+    alert("Tanggal dan jam booking harus diisi!");
+    return;
+  }
+  
+  // Simulasi proses booking
+  setTimeout(() => {
+    isBookingSuccess.value = true;
+    
+    // Auto close popup setelah 3 detik
+    setTimeout(() => {
+      closePopup();
+      // Reset form
+      tanggal.value = "";
+      jam.value = "";
+    }, 3000);
+  }, 1500);
+}
+
+// Fungsi untuk menutup popup
+function closePopup() {
+  showPopup.value = false;
+  selectedField.value = null;
+  isBookingSuccess.value = false;
+}
+
+// Format tanggal untuk tampilan
+function formatDate(dateString: string) {
+  if (!dateString) return "";
+  const date = new Date(dateString);
+  return date.toLocaleDateString("id-ID", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric"
+  });
+}
 </script>
 
 <template>
@@ -119,6 +177,7 @@ function formatPrice(price: number): string {
                 v-model="tanggal"
                 type="date"
                 class="date-input"
+                :min="new Date().toISOString().split('T')[0]"
               />
             </div>
           </div>
@@ -167,13 +226,99 @@ function formatPrice(price: number): string {
               </span>
             </div>
 
-            <button class="btn-book">Pesan Sekarang</button>
+            <button class="btn-book" @click="openBookingPopup(field)">
+              Pesan Sekarang
+            </button>
           </div>
         </div>
       </div>
     </main>
 
     <AppFooter />
+
+    <!-- POPUP BOOKING -->
+    <div v-if="showPopup" class="popup-overlay">
+      <div class="popup-container">
+        <div class="popup-header">
+          <h2 class="popup-title">Konfirmasi Booking</h2>
+          <button class="popup-close" @click="closePopup">×</button>
+        </div>
+        
+        <div class="popup-content">
+          <!-- Status Loading/Success -->
+          <div v-if="!isBookingSuccess" class="booking-status">
+            <div class="status-icon loading">⏳</div>
+            <p class="status-text">Memproses booking...</p>
+          </div>
+          
+          <div v-else class="booking-status success">
+            <div class="status-icon">✅</div>
+            <p class="status-text">Booking berhasil!</p>
+          </div>
+
+          <!-- Detail Lapangan -->
+          <div v-if="selectedField" class="field-details">
+            <div class="detail-header">
+              <h3 class="detail-title">{{ selectedField.name }}</h3>
+              <div class="sport-badge">{{ selectedField.sport }}</div>
+            </div>
+            
+            <div class="detail-info">
+              <div class="info-row">
+                <span class="info-label">📍</span>
+                <span class="info-text">{{ selectedField.address }}</span>
+              </div>
+              
+              <div class="info-row">
+                <span class="info-label">📅</span>
+                <span class="info-text">{{ formatDate(tanggal) }}</span>
+              </div>
+              
+              <div class="info-row">
+                <span class="info-label">🕐</span>
+                <span class="info-text">{{ jam }} WIB</span>
+              </div>
+            </div>
+
+            <!-- Fasilitas -->
+            <div class="facilities-section">
+              <h4 class="facilities-title">Fasilitas:</h4>
+              <div class="facilities-list">
+                <span class="facility-badge" v-for="(facility, index) in selectedField.facilities" :key="index">
+                  {{ facility }}
+                </span>
+              </div>
+            </div>
+
+            <!-- Harga -->
+            <div class="price-section">
+              <div class="price-row">
+                <span class="price-label">Harga:</span>
+                <span class="price-value">{{ formatPrice(selectedField.price) }} / {{ selectedField.priceUnit }}</span>
+              </div>
+              <div class="total-price">
+                <span class="total-label">Total Pembayaran:</span>
+                <span class="total-value">{{ formatPrice(selectedField.price) }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tombol Aksi -->
+          <div v-if="!isBookingSuccess" class="popup-actions">
+            <button class="btn-cancel" @click="closePopup">Batal</button>
+            <button class="btn-confirm" @click="confirmBooking">
+              Konfirmasi Booking
+            </button>
+          </div>
+          
+          <div v-else class="popup-actions">
+            <button class="btn-close-success" @click="closePopup">
+              Tutup
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -181,6 +326,7 @@ function formatPrice(price: number): string {
 .wrapper {
   background-color: #f5f7fa;
   min-height: 100vh;
+  position: relative;
 }
 
 .container {
@@ -460,6 +606,337 @@ function formatPrice(price: number): string {
   transform: translateY(0);
 }
 
+/* POPUP STYLES */
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+  animation: fadeIn 0.3s ease;
+}
+
+.popup-container {
+  background: white;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  animation: slideUp 0.3s ease;
+}
+
+.popup-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.popup-title {
+  font-size: 20px;
+  font-weight: 900;
+  color: #1a202c;
+  margin: 0;
+}
+
+.popup-close {
+  background: none;
+  border: none;
+  font-size: 28px;
+  color: #718096;
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.popup-close:hover {
+  background: #f7fafc;
+  color: #e11d48;
+}
+
+.popup-content {
+  padding: 24px;
+}
+
+.booking-status {
+  text-align: center;
+  margin-bottom: 24px;
+  padding: 20px;
+  background: #f7fafc;
+  border-radius: 12px;
+}
+
+.booking-status.success {
+  background: #f0fff4;
+  border: 1px solid #9ae6b4;
+}
+
+.status-icon {
+  font-size: 48px;
+  margin-bottom: 12px;
+  animation: pulse 1.5s infinite;
+}
+
+.status-icon.loading {
+  animation: spin 1s linear infinite;
+}
+
+.status-text {
+  font-size: 16px;
+  font-weight: 700;
+  color: #2d3748;
+  margin: 0;
+}
+
+.booking-status.success .status-text {
+  color: #276749;
+}
+
+.field-details {
+  margin-bottom: 24px;
+}
+
+.detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+.detail-title {
+  font-size: 18px;
+  font-weight: 900;
+  color: #1a202c;
+  margin: 0;
+  flex: 1;
+}
+
+.sport-badge {
+  background: #e11d48;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: capitalize;
+}
+
+.detail-info {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.info-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.info-label {
+  font-size: 16px;
+  opacity: 0.8;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.info-text {
+  font-size: 14px;
+  color: #4a5568;
+  line-height: 1.5;
+}
+
+.facilities-section {
+  margin-bottom: 24px;
+}
+
+.facilities-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #2d3748;
+  margin: 0 0 12px 0;
+}
+
+.facilities-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.facility-badge {
+  display: inline-block;
+  padding: 6px 12px;
+  background: #edf2f7;
+  color: #4a5568;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.price-section {
+  background: #f7fafc;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 24px;
+}
+
+.price-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.price-label {
+  font-size: 14px;
+  color: #4a5568;
+}
+
+.price-value {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1a202c;
+}
+
+.total-price {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 12px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.total-label {
+  font-size: 16px;
+  font-weight: 900;
+  color: #1a202c;
+}
+
+.total-value {
+  font-size: 20px;
+  font-weight: 900;
+  color: #e11d48;
+}
+
+.popup-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.btn-cancel {
+  flex: 1;
+  height: 48px;
+  background: #f7fafc;
+  color: #4a5568;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-cancel:hover {
+  background: #edf2f7;
+  border-color: #cbd5e1;
+}
+
+.btn-confirm {
+  flex: 1;
+  height: 48px;
+  background: linear-gradient(135deg, #e11d48 0%, #be123c 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(225, 29, 72, 0.15);
+}
+
+.btn-confirm:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(225, 29, 72, 0.2);
+}
+
+.btn-confirm:active {
+  transform: translateY(0);
+}
+
+.btn-close-success {
+  width: 100%;
+  height: 48px;
+  background: linear-gradient(135deg, #38a169 0%, #276749 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-close-success:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(56, 161, 105, 0.2);
+}
+
+/* ANIMATIONS */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 /* RESPONSIVE */
 @media (max-width: 900px) {
   .container {
@@ -478,6 +955,10 @@ function formatPrice(price: number): string {
   .fields-grid {
     grid-template-columns: 1fr;
     gap: 16px;
+  }
+  
+  .popup-container {
+    max-width: 100%;
   }
 }
 
@@ -535,6 +1016,24 @@ function formatPrice(price: number): string {
   .btn-book {
     height: 36px;
     font-size: 12px;
+  }
+  
+  .popup-header {
+    padding: 16px 20px;
+  }
+  
+  .popup-content {
+    padding: 20px;
+  }
+  
+  .popup-actions {
+    flex-direction: column;
+  }
+  
+  .btn-cancel,
+  .btn-confirm,
+  .btn-close-success {
+    width: 100%;
   }
 }
 </style>
