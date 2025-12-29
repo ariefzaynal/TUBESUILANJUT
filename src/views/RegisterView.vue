@@ -51,7 +51,7 @@ function onRegister() {
         <form class="form" @submit.prevent="onRegister">
           <div class="group">
             <label>Nama Tim</label>
-            <input v-model="teamName" type="text" placeholder="FC Thunder" required />
+            <input v-model="teamName" type="text" placeholder="Masukkan Nama Tim" required />
           </div>
 
           <div class="group">
@@ -61,12 +61,12 @@ function onRegister() {
 
           <div class="group">
             <label>Olahraga Utama</label>
-            <input v-model="sport" type="text" placeholder="Futsal, Basketball, dll" required />
+            <input v-model="sport" type="text" placeholder="Masukkan Olahraga" required />
           </div>
 
           <div class="group">
             <label>Lokasi</label>
-            <input v-model="location" type="text" placeholder="Jakarta Selatan" required />
+            <input v-model="location" type="text" placeholder="Masukkan Lokasi" required />
           </div>
 
           <div class="group">

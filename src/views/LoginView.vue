@@ -65,9 +65,6 @@ function onLogin() {
 
           <button class="submit" type="submit">Masuk</button>
 
-          <p class="forgot">
-            <a href="#">Lupa password?</a>
-          </p>
         </form>
       </div>
     </div>
